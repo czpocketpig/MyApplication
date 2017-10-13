@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
             groupBean = new GroupBean();
             groupBean.setSpacename("深圳航港" + i);
             groupBean.setChildsize(8);
-            childBeanList=new ArrayList<ChildBean>();
+            childBeanList = new ArrayList<ChildBean>();
             for (int j = 0; j < 8; j++) {
                 childBean = new ChildBean();
                 childBean.setPrice(1 + j);
@@ -59,9 +59,10 @@ public class MainActivity extends Activity {
                 childBean.setFlag(j);
                 childBeanList.add(childBean);
             }
+
             groupBean.setChildBeanList(childBeanList);
             groupBeanList.add(groupBean);
-
+//            System.out.println(groupBeanList.get(i).getChildsize()+"__________"+i);
         }
         MyAdapter myAdapter = new MyAdapter();
         mListview.setGroupIndicator(null);
@@ -72,24 +73,22 @@ public class MainActivity extends Activity {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v,
                                         int groupPosition, long id) {
-                Toast.makeText(MainActivity.this, "第"+groupPosition+"组被点击了", Toast.LENGTH_SHORT).show();
-//                if(groupBeanList.get(groupPosition).getIsexpand()){
-//                    mListview.collapseGroup(groupPosition);
-//                }else {
-//                    mListview.expandGroup(groupPosition);
-//                }
+                Toast.makeText(MainActivity.this, "第" + groupPosition + "组被点击了", Toast.LENGTH_SHORT).show();
 
+                // 请务必返回 false，否则分组不会展开
+                //因为当设置setOnGroupClickListener监听并让其返回true时,所有Group消费点击事件，事件均不能分发传递给child
+                // (换言之，设置setOnChildClickListener不起任何作用)。
                 return false;
             }
         });
         /**
          * ExpandableListView的组展开监听
-         */
+         **/
         mListview.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int i) {
-                Toast.makeText(MainActivity.this, "第"+i+"组展开", Toast.LENGTH_SHORT).show();
-                groupBeanList.get(i).setIsexpand(false);
+                Toast.makeText(MainActivity.this, "第" + i + "组展开", Toast.LENGTH_SHORT).show();
+
             }
         });
         /**
@@ -98,8 +97,8 @@ public class MainActivity extends Activity {
         mListview.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
             @Override
             public void onGroupCollapse(int i) {
-                Toast.makeText(MainActivity.this, "第"+i+"组合拢", Toast.LENGTH_SHORT).show();
-                groupBeanList.get(i).setIsexpand(true);
+                Toast.makeText(MainActivity.this, "第" + i + "组合拢", Toast.LENGTH_SHORT).show();
+
             }
         });
         /**
@@ -108,8 +107,9 @@ public class MainActivity extends Activity {
         mListview.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
-                Toast.makeText(MainActivity.this, "第"+i+"组的第"+i1+"被点击了", Toast.LENGTH_SHORT).show();
-                return true;             }
+                Toast.makeText(MainActivity.this, "第" + i + "组的第" + i1 + "被点击了", Toast.LENGTH_SHORT).show();
+                return true;
+            }
         });
         mListview.setAdapter(myAdapter);
 
@@ -123,53 +123,61 @@ public class MainActivity extends Activity {
 
 
     class MyAdapter extends BaseExpandableListAdapter {
+        //        获取分组的个数
         @Override
         public int getGroupCount() {
             return groupBeanList.size();
         }
 
+        //        获取指定分组中的子选项的个数
         @Override
-        public int getChildrenCount(int i) {
-            return i;
+        public int getChildrenCount(int groupPosition) {
+            return groupBeanList.get(groupPosition).getChildsize();
         }
 
+        //        获取指定的分组数据
         @Override
-        public Object getGroup(int i) {
-            return groupBeanList.get(i);
+        public Object getGroup(int groupPosition) {
+            return groupBeanList.get(groupPosition);
         }
 
+        //        获取指定分组中的指定子选项数据
         @Override
-        public Object getChild(int i, int i1) {
+        public Object getChild(int groupPosition, int childPosition) {
             return null;
         }
 
+        //        获取指定分组的ID, 这个ID必须是唯一的
         @Override
         public long getGroupId(int i) {
             return i;
         }
 
+        //        获取子选项的ID, 这个ID必须是唯一的
         @Override
         public long getChildId(int groupPosition, int childPosition) {
             return childPosition;
         }
 
+        //        分组和子选项是否持有稳定的ID, 就是说底层数据的改变会不会影响到它们。
         @Override
         public boolean hasStableIds() {
             return true;
         }
 
+        //        获取显示指定分组的视图
         @Override
         public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-            View view=null;
-            GroupHolder groupHolder=null;
-            if (convertView!=null){
-                view=convertView;
-                groupHolder=(GroupHolder) view.getTag();
+            View view = null;
+            GroupHolder groupHolder;
+            if (convertView != null) {
+                view = convertView;
+                groupHolder = (GroupHolder) view.getTag();
 
-            }else {
-                view=View.inflate(MainActivity.this,R.layout.group,null);
-                groupHolder=new GroupHolder();
-                groupHolder.mSpaceText=view.findViewById(R.id.group_text);
+            } else {
+                view = View.inflate(MainActivity.this, R.layout.group, null);
+                groupHolder = new GroupHolder();
+                groupHolder.mSpaceText = view.findViewById(R.id.group_text);
                 view.setTag(groupHolder);
             }
             groupHolder.mSpaceText.setText(groupBeanList.get(groupPosition).getSpacename());
@@ -179,7 +187,7 @@ public class MainActivity extends Activity {
         @Override
         public View getChildView(final int groupPosition, final int childPosition,
                                  boolean isLastChild, View convertView, ViewGroup parent) {
-            View view = null;
+            View view ;
             ChildHolder childHolder;
             if (convertView != null) {
                 view = convertView;
@@ -200,8 +208,9 @@ public class MainActivity extends Activity {
                 }
             });
             childHolder.mPrice.setText(groupBeanList.get(groupPosition).getChildBeanList().get(childPosition).getPrice() + "");
-            int len = groupBeanList.get(groupPosition).getChildBeanList().size();
-            System.out.println(len + "--------------");
+//            int len = groupBeanList.get(groupPosition).getChildBeanList().size();
+
+//            System.out.println(groupPosition + "--------------"+childPosition+len);
             childHolder.mStateText.setText(groupBeanList.get(groupPosition).getChildBeanList().get(childPosition).getTitle());
             childHolder.mSecondPrice.setText(groupBeanList.get(groupPosition).getChildBeanList().get(childPosition).getSceondprice() + "");
 

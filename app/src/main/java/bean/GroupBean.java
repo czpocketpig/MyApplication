@@ -7,17 +7,9 @@ import java.util.List;
  */
 
 public class GroupBean {
-    private  String spacename;
-    private  int childsize;
-    private   Boolean isexpand=false;
+    private String spacename;
+    private int childsize;
 
-    public Boolean getIsexpand() {
-        return isexpand;
-    }
-
-    public void setIsexpand(Boolean isexpand) {
-        this.isexpand = isexpand;
-    }
 
     private List<ChildBean> childBeanList;
 
