@@ -1,1 +1,1 @@
-include ':app', ':myapplication2', ':videoapplication'
+include ':app', ':myapplication2', ':videoapplication', ':rxjavademo'
